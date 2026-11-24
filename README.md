@@ -91,6 +91,18 @@ In **Anaconda Prompt**, enter each command separately, press Enter, and wait unt
    python -m ipykernel install --sys-prefix --name labir-loader --display-name "Python (LabIR Loader)"
    ```
 
+### Optional installation cell in the notebook
+
+The notebook keeps a commented installation command in **0. Install dependencies**:
+
+```python
+# %pip install -r requirements.txt
+```
+
+If you are unsure whether dependencies are available, remove `# `, run that cell, and wait for successful completion. Put `# ` back, restart the kernel, and run sections **1–3**. `%pip` uses the selected notebook environment and normally leaves packages satisfying the requirements installed. Missing or incompatible packages may be installed or updated; internet access may be needed. Keep the cell for a future computer or environment. **Run All** does not install anything while the line is commented.
+
+This installs the project dependencies, not the browser notebook application. The `notebook` application must already be installed to open the notebook, as described above.
+
 ## 5. Open the notebook and run the example
 
 1. In the same Anaconda Prompt, enter:
@@ -102,8 +114,8 @@ In **Anaconda Prompt**, enter each command separately, press Enter, and wait unt
 2. Keep that command window open. A browser should open showing the project files. If it does not, copy the complete local URL printed in the command window, including its token, into your browser's address bar.
 3. Click `Load_LRC.ipynb`. A **notebook** contains explanatory text and Python blocks called **code cells**.
 4. Select **Python (LabIR Loader)** as the kernel. A **kernel** is the Python process running the code. If another name is shown, use **Kernel → Change Kernel** to choose the named environment.
-5. Click inside the first code cell and press **Shift+Enter**. Repeat for the second and third code cells in order. An `[*]` indicator means a cell is running; wait until it finishes. Stop at an error and consult Troubleshooting below.
-6. The second code cell prints recording metadata. The third shows a thermogram and **Frame index** slider. Move the slider to browse the frames.
+5. The optional installation cell in section **0** is commented by default. Leave it commented if you completed setup above. Run the three processing code cells in sections **1–3**, in order, using **Shift+Enter**. An `[*]` indicator means a cell is running; wait until it finishes. Stop at an error and consult Troubleshooting below.
+6. The loading cell in section **2** prints recording metadata. The viewer cell in section **3** shows a thermogram and **Frame index** slider. Move the slider to browse the frames.
 
 The browser displays a Jupyter server on your own computer. This workflow does not upload recordings to GitHub or a cloud notebook service.
 
@@ -128,7 +140,7 @@ The value range is approximately **25.824 to 98.140**. The slider uses indices *
 
 Check the example first, then choose either method:
 
-**Copy your file into `LRC_Files`**, without replacing the example. Change only this line in the second code cell to your actual file name:
+**Copy your file into `LRC_Files`**, without replacing the example. Change only this line in the loading cell in section **2** to your actual file name:
 
 ```python
 file_path = "LRC_Files/my_recording.lrc"
@@ -195,7 +207,7 @@ Notebook saves may include plots and your input path. Clear outputs and restore 
 | `LRC DLL not found` | Restore `LRCRecording.dll` beside `loaders.py` from the complete download. |
 | `Failed to load DLL` or `WinError 126` | Check the DLL is present and install/repair the Microsoft Visual C++ v14 **x64** runtime. A dependency may be missing even if the DLL exists. |
 | `WinError 193` or platform error | Use 64-bit Python locally on Windows x64. |
-| Static image, no moving slider, or widget error | Check the kernel, repeat package installation, restart the kernel, and run the three code cells again. Keep `%matplotlib widget` in the first cell. |
+| Static image, no moving slider, or widget error | Check the kernel, repeat package installation, restart the kernel, and run sections **1–3** again. Keep `%matplotlib widget` in the **Enable interactive figures** cell. |
 | `NameError` for `frames` or `times` | Run the loading cell successfully before the viewer, including after a restart. |
 | Memory error on a large recording | Try the small example first; the whole recording must fit in available RAM. |
 | Example works but your recording fails | Preserve the recording and complete error text. Contact the owner; the file may be damaged or use an unsupported variant. |

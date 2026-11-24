@@ -52,27 +52,32 @@ Choose either route, then continue below. Choosing **Python: Select Interpreter*
 
 ## 5. Install packages in that kernel — first time only
 
-You can install directly in the notebook without a terminal:
+The notebook includes a permanent, optional installation cell. No terminal or temporary cell is needed:
 
-1. At the top of `Load_LRC.ipynb`, add a temporary **code** cell using **+ Code**, and enter:
+1. Find **0. Install dependencies** near the top of `Load_LRC.ipynb`. Its code cell contains:
+
+   ```python
+   # %pip install -r requirements.txt
+   ```
+
+2. If this is a new environment, or you are unsure whether packages are installed, remove the leading `#` and space so that the line reads:
 
    ```python
    %pip install -r requirements.txt
    ```
 
-2. Click inside that cell and press **Shift+Enter**, or click its triangle Run button. `%pip` installs into the selected notebook environment. `Requirement already satisfied` is normal, including when environment creation installed the packages.
-3. Wait until it finishes without errors. Do not run other cells while installation is active. If an error appears, stop and consult Troubleshooting.
-4. Use **Restart** in the notebook toolbar to restart the kernel, confirming if asked.
-5. Delete the temporary installation cell using its cell menu or trash icon. Keep the three original code cells and save with **Ctrl+S**.
+3. Run that cell with **Shift+Enter** or its triangle Run button. `%pip` uses the selected notebook kernel. `Requirement already satisfied` is normal: packages satisfying the requirements normally remain installed. Missing or incompatible packages may be installed or updated, and internet access may be needed.
+4. Wait for completion without errors. Then put `# ` back at the beginning of the line. Keep the cell for future use; do not delete it.
+5. Use **Restart** in the notebook toolbar to restart the kernel, confirming if asked. Save with **Ctrl+S**, then run sections **1–3** in order.
 
-Do this once per environment, and again if dependencies change. The separate `notebook` application is not needed for VS Code.
+Skip installation if this environment already has the dependencies. With the line commented, **Run All** leaves installation disabled. Uncomment it again when moving to another computer or environment, or if dependencies change. The separate `notebook` application is not needed for VS Code.
 
 ## 6. Run the example
 
 1. Confirm the top-right kernel selector shows your chosen environment.
-2. Run the first original code cell with **Shift+Enter**. `%matplotlib widget` enables the interactive plot.
-3. Run the second code cell, which loads the example through `LRCRecording.dll`. Wait for successful completion and the metadata printout.
-4. Run the third code cell. A thermogram and **Frame index** slider should appear.
+2. Run the code cell in **1. Enable interactive figures** with **Shift+Enter**. `%matplotlib widget` enables the interactive plot.
+3. Run the code cell in **2. Load the thermography recording**, which loads the example through `LRCRecording.dll`. Wait for successful completion and the metadata printout.
+4. Run the code cell in **3. Browse the temperature field**. A thermogram and **Frame index** slider should appear.
 5. Move the slider to change frames. On later runs, you can use **Run All** instead of running cells individually.
 
 The example should print:
@@ -136,7 +141,7 @@ For a script in this folder, use `from loaders import load_lrc`; loading does no
 
 1. Open the same folder in VS Code.
 2. Open `Load_LRC.ipynb` and check its kernel.
-3. Run the three code cells in order, or use **Run All**.
+3. Run the three processing code cells in sections **1–3**, in order, or use **Run All**.
 
 No package installation is needed for each session. After a restart, saved pictures do not restore arrays in memory: run the code again. Save edits with **Ctrl+S**. Shut down the notebook kernel when finished, or close VS Code. Before sharing an edited notebook, clear outputs and restore the example path: saved notebooks may contain plots and your local input path.
 
@@ -150,7 +155,7 @@ No package installation is needed for each session. After a restart, saved pictu
 | `requirements.txt` missing | Open the complete folder with **File → Open Folder** and keep the notebook in its root. Check the working folder with the diagnostic cell below. |
 | `No module named loaders` or `visualization` | Keep both modules beside the notebook. If you customized the notebook root directory setting, restore its default or set it to the project folder, then restart the kernel. |
 | `ModuleNotFoundError` for a package | Check the notebook kernel, repeat step 5 in that kernel, and restart it. |
-| Static image, no moving slider, or widget error | Repeat step 5, restart the kernel, and run all three cells. Keep `%matplotlib widget` in the first cell. |
+| Static image, no moving slider, or widget error | Repeat step 5, restart the kernel, and run sections **1–3**. Keep `%matplotlib widget` in the **Enable interactive figures** cell. |
 | `NameError` for `frames` or `times` | Run the loading cell successfully before the viewer, especially after a restart. |
 | `LRC file not found` | Check spelling and extension. Try a full path using `r"..."`. |
 | `Failed to open LRC file` although the file exists | Try a full path containing only ASCII characters, including every parent folder. Rename or copy the file if necessary. An `r` prefix alone does not fix DLL path encoding. |
