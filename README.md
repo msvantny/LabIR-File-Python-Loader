@@ -134,6 +134,10 @@ Recorded time span:  0.020000 s
 
 The value range is approximately **25.824 to 98.140**. The slider uses indices **0–5**, while the image title counts frames **1–6**. The color scale follows each frame's minimum and maximum: compare numeric color-bar values, not colors alone.
 
+![Example thermogram with color scale and frame slider](docs/images/vscode-viewer.jpg)
+
+*Example result shown in VS Code. The browser workflow uses the same notebook viewer; the surrounding interface differs. Slider index 2 displays frame 3 of 6 at 0.0080 seconds.*
+
 ## 6. Load your own recording
 
 **Path limitation:** use ASCII-only names for the LRC file and every folder in its full path (no accented letters or other non-ASCII characters). The current DLL call failed when the same working example was renamed to `měření.lrc`; spaces in a file name worked. If your Windows user name contains accented letters, put the recording in another writable folder with an ASCII-only full path. Adding `r` before a Python path string does not fix this encoding limitation.
@@ -235,6 +239,7 @@ print("Working folder:", Path.cwd())
 | `visualization.py` | Frame slider viewer |
 | `LRCRecording.dll` | Internal LabIR Windows x64 reading library, supplied with the project |
 | `requirements.txt` | Python packages; install `notebook` additionally for browser use |
+| `docs/images/` | Screenshots illustrating kernel selection, loading output, and the viewer |
 | `LRC_Files/sample_sequence_320x256_250Hz_006Fr.lrc` | Verified small example |
 
 `.gitignore` excludes local environments, checkpoints, editor settings, generated figures, and additional LRC recordings. The named example is the exception. Ignore rules do not remove files already tracked in Git.

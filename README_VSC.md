@@ -42,6 +42,10 @@ An **environment** is a Python installation with its packages. A notebook **kern
 3. If needed, choose **Select Another Kernel → Python Environments** and select your local 64-bit Python environment, preferably Python 3.12. Use your own environment name; no particular Conda name is required.
 4. If prompted to install `ipykernel`, accept and wait. You may need to select the kernel again.
 
+![Selecting a local Python environment for the notebook in VS Code](docs/images/vscode-select-kernel.jpg)
+
+*Example kernel selection. `project_base_env` is the author's environment name; choose your own suitable environment, not necessarily one with this name.*
+
 ### Or create a separate project environment
 
 1. Press **Ctrl+Shift+P** to open the Command Palette.
@@ -91,7 +95,15 @@ Sampling frequency:  250.000 Hz
 Recorded time span:  0.020000 s
 ```
 
+![LRC loading cell and metadata for the included six-frame recording](docs/images/vscode-loader.jpg)
+
+*Example loading output. The absolute file path is specific to the computer used for this screenshot; your path will be different.*
+
 The value range is approximately **25.824 to 98.140**. Slider indices are **0–5**, while the title counts frames **1–6**. The color range changes with each frame's minimum and maximum, so compare numeric color-bar values rather than colors alone.
+
+![Thermogram viewer in VS Code with color scale and frame slider](docs/images/vscode-viewer.jpg)
+
+*The viewer at slider index 2: frame 3 of 6, at 0.0080 seconds. Move the slider to browse the recording.*
 
 ## 7. Load your own recording
 
