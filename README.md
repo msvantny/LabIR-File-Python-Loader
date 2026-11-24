@@ -234,6 +234,7 @@ print("Working folder:", Path.cwd())
 | --- | --- |
 | `README.md` | Complete browser-based Jupyter guide |
 | `README_VSC.md` | Complete, equal alternative for existing VS Code users |
+| `LICENSE` | MIT license covering the supplied project files |
 | `Load_LRC.ipynb` | Load a recording and show the slider |
 | `loaders.py` | LRC loader returning NumPy arrays |
 | `visualization.py` | Frame slider viewer |
@@ -243,6 +244,14 @@ print("Working folder:", Path.cwd())
 | `LRC_Files/sample_sequence_320x256_250Hz_006Fr.lrc` | Verified small example |
 
 `.gitignore` excludes local environments, checkpoints, editor settings, generated figures, and additional LRC recordings. The named example is the exception. Ignore rules do not remove files already tracked in Git.
+
+## License
+
+Copyright (c) University of West Bohemia 2026.
+
+The Python code, notebook, documentation, bundled `LRCRecording.dll`, example recording, and screenshots are provided under the [MIT License](LICENSE). You may use, modify, and redistribute them, including commercially, provided that you retain the copyright and license notice. They are provided without warranty; see the license for the full terms.
+
+Third-party Python dependencies retain their own licenses.
 
 ## Validation and references
 

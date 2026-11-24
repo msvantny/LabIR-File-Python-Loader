@@ -191,6 +191,14 @@ print("Working folder:", Path.cwd())
 
 Bitness should be **64**. The working folder should contain `loaders.py`, `requirements.txt`, and `LRC_Files`. Include this output, the complete error, and whether the example works when asking for help.
 
+## License
+
+Copyright (c) University of West Bohemia 2026.
+
+The Python code, notebook, documentation, bundled `LRCRecording.dll`, example recording, and screenshots are provided under the [MIT License](LICENSE). You may use, modify, and redistribute them, including commercially, provided that you retain the copyright and license notice. They are provided without warranty; see the license for the full terms.
+
+Third-party Python dependencies retain their own licenses.
+
 ## Validation and references
 
 ### Tested configuration
