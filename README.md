@@ -124,6 +124,8 @@ The value range is approximately **25.824 to 98.140**. The slider uses indices *
 
 ## 6. Load your own recording
 
+**Path limitation:** use ASCII-only names for the LRC file and every folder in its full path (no accented letters or other non-ASCII characters). The current DLL call failed when the same working example was renamed to `měření.lrc`; spaces in a file name worked. If your Windows user name contains accented letters, put the recording in another writable folder with an ASCII-only full path. Adding `r` before a Python path string does not fix this encoding limitation.
+
 Check the example first, then choose either method:
 
 **Copy your file into `LRC_Files`**, without replacing the example. Change only this line in the second code cell to your actual file name:
@@ -189,6 +191,7 @@ Notebook saves may include plots and your input path. Clear outputs and restore 
 | `No module named loaders` or `visualization` | Keep both modules beside the notebook. Stop Jupyter and start it from the project folder. |
 | Missing Python package or no `jupyter` command | Activate `labir-loader`, repeat step 4's installation command, and select **Python (LabIR Loader)** in the notebook. |
 | `LRC file not found` | Check spelling, extension, and path. Try a full path using `r"..."`. |
+| `Failed to open LRC file` although the file exists | Try a full path containing only ASCII characters, including every parent folder. Rename or copy the file if necessary. An `r` prefix alone does not fix DLL path encoding. |
 | `LRC DLL not found` | Restore `LRCRecording.dll` beside `loaders.py` from the complete download. |
 | `Failed to load DLL` or `WinError 126` | Check the DLL is present and install/repair the Microsoft Visual C++ v14 **x64** runtime. A dependency may be missing even if the DLL exists. |
 | `WinError 193` or platform error | Use 64-bit Python locally on Windows x64. |

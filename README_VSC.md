@@ -90,6 +90,8 @@ The value range is approximately **25.824 to 98.140**. Slider indices are **0–
 
 ## 7. Load your own recording
 
+**Path limitation:** use ASCII-only names for the LRC file and every folder in its full path (no accented letters or other non-ASCII characters). The current DLL call failed when the same working example was renamed to `měření.lrc`; spaces in a file name worked. If your Windows user name contains accented letters, put the recording in another writable folder with an ASCII-only full path. Adding `r` before a Python path string does not fix this encoding limitation.
+
 Verify the included example first. Then choose either method:
 
 **Copy your recording into `LRC_Files`** and change this line in the loading cell to your actual file name:
@@ -151,6 +153,7 @@ No package installation is needed for each session. After a restart, saved pictu
 | Static image, no moving slider, or widget error | Repeat step 5, restart the kernel, and run all three cells. Keep `%matplotlib widget` in the first cell. |
 | `NameError` for `frames` or `times` | Run the loading cell successfully before the viewer, especially after a restart. |
 | `LRC file not found` | Check spelling and extension. Try a full path using `r"..."`. |
+| `Failed to open LRC file` although the file exists | Try a full path containing only ASCII characters, including every parent folder. Rename or copy the file if necessary. An `r` prefix alone does not fix DLL path encoding. |
 | `LRC DLL not found` | Restore `LRCRecording.dll` beside `loaders.py` from the complete download. |
 | `Failed to load DLL` or `WinError 126` | Check the DLL is present and install/repair Microsoft's Visual C++ v14 **x64** runtime. Missing dependencies can cause this error even when the DLL exists. |
 | `WinError 193` or platform error | Select a local Windows x64, 64-bit Python kernel, not a Linux/WSL or 32-bit kernel. |
