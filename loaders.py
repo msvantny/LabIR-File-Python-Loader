@@ -1,4 +1,10 @@
-"""Load LRC recordings using the bundled Windows x64 LRCRecording.dll."""
+"""Load LRC recordings using the bundled Windows x64 LRCRecording.dll.
+
+Adapted from Python/LRC_loading.py (2023) by Lukáš Mužika (LukasM).
+Upstream: https://github.com/labirthermal/lrc-recording/tree/v2.1
+Library release DOI: https://doi.org/10.5281/zenodo.24165802
+Copyright (c) University of West Bohemia 2026. MIT License; see LICENSE.
+"""
 
 import ctypes
 import os
@@ -20,16 +26,20 @@ def load_lrc(file_path: str):
     Returns
     -------
     frames : np.ndarray
-        3D thermography cube (H, W, T)
+        3D recorded-value cube (H, W, T); units are not returned by this API
     time_axes : np.ndarray
         Float64 time vector in seconds.
 
     Notes
     -----
     Requires Windows x64 and a 64-bit Python interpreter. The entire recording
-    is loaded into memory. Temperature units and calibration are provided by
-    the DLL and are not independently verified here.
-    The DLL API is undocumented; calls retain the established conventions.
+    is loaded into memory. Values are decoded by the DLL; this Python layer
+    does not assume degrees Celsius or apply additional unit conversion or
+    radiometric correction. LRC v2 defines stream-unit codes, but the C wrapper
+    used here does not expose that code. Confirm units from recording/camera
+    metadata rather than inferring them from numeric values.
+    C signatures follow LRCRecording/LRCRecordingWrapper.h in upstream v2.1;
+    the file format is documented in docs/LRC-FORMAT.md in that repository.
     Concurrent or nested calls are not supported because the DLL uses a
     process-wide recording interface.
     """
@@ -54,11 +64,28 @@ def load_lrc(file_path: str):
             "x64 runtime dependencies."
         ) from exc
 
+    # C API signatures: upstream v2.1 LRCRecording/LRCRecordingWrapper.h.
+    LRC_lib.Open.argtypes = [ctypes.c_char_p]
+    LRC_lib.Open.restype = ctypes.c_int
+    LRC_lib.Close.argtypes = []
+    LRC_lib.Close.restype = None
+    for name in ("GetFrameCount", "GetWidth", "GetHeight"):
+        function = getattr(LRC_lib, name)
+        function.argtypes = []
+        function.restype = ctypes.c_int
+    LRC_lib.GetTemperatureData.argtypes = []
+    LRC_lib.GetTemperatureData.restype = ctypes.POINTER(ctypes.c_float)
+    LRC_lib.GetTimeFromBeginning.argtypes = []
+    LRC_lib.GetTimeFromBeginning.restype = ctypes.c_uint64
+    LRC_lib.NextFrame.argtypes = []
+    LRC_lib.NextFrame.restype = None
+
     # Encode file path as bytes for ctypes
     file_path_bytes = os.path.abspath(file_path).encode("utf-8")
 
     # Open file
     if LRC_lib.Open(ctypes.c_char_p(file_path_bytes)) != 0:
+        LRC_lib.Close()
         raise RuntimeError(f"Failed to open LRC file: {file_path}")
 
     try:
@@ -73,20 +100,20 @@ def load_lrc(file_path: str):
 
         frames = np.empty((height, width, frame_count), dtype=np.float32)
         time_axes = np.empty(frame_count, dtype=np.float64)
-        LRC_lib.GetTemperatureData.restype = ctypes.POINTER(ctypes.c_float)
+        # The documented buffer is acquired once and updated by NextFrame().
+        pointer_to_frame = LRC_lib.GetTemperatureData()
+        if not pointer_to_frame:
+            raise RuntimeError("No temperature data for the first frame")
+        frame = np.ctypeslib.as_array(pointer_to_frame, shape=(height, width))
 
         for frame_idx in range(frame_count):
-            pointer_to_frame = LRC_lib.GetTemperatureData()
-            if not pointer_to_frame:
-                raise RuntimeError(f"No temperature data for frame {frame_idx}")
-            frame = np.ctypeslib.as_array(pointer_to_frame, shape=(height, width))
-            # Assignment copies the DLL buffer before advancing to the next frame.
+            # Copy the shared DLL buffer before it is updated for the next frame.
             frames[:, :, frame_idx] = frame
             time_axes[frame_idx] = LRC_lib.GetTimeFromBeginning() / 1000.0
-            # Preserve the established API convention; its status is undocumented.
-            LRC_lib.NextFrame()
+            if frame_idx + 1 < frame_count:
+                LRC_lib.NextFrame()
     finally:
-        LRC_lib.Close(ctypes.c_char_p(file_path_bytes))
+        LRC_lib.Close()
 
     # Derive timing information from the timestamps returned by the recording.
     positive_intervals = np.diff(time_axes)
@@ -123,7 +150,7 @@ def load_lrc(file_path: str):
     print(f"Recorded time span:  {recorded_time_span:.6f} s")
     print(
         f"Temperature range:   {np.min(frames):.3f} to {np.max(frames):.3f} "
-        "(unit not reported by the LRC interface)"
+        "(stream unit not exposed by the DLL C API)"
     )
 
     return frames, time_axes

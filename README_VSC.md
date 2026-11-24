@@ -6,7 +6,7 @@ The project loads LabIR LRC recordings into NumPy arrays and provides a simple f
 
 ## 1. Check the prerequisites
 
-- Work **locally on Windows x64**, with **64-bit Python**. Python 3.12 is the reference version. WSL, Linux, macOS, Google Colab, and remote Linux kernels cannot use the Windows DLL.
+- Work **locally on Windows x64**, with **64-bit Python**. Python 3.12 is the reference version. WSL, Linux, macOS, Google Colab, and remote Linux kernels cannot use the Windows DLL. For a pure-Python reader supporting a subset of LRC variants on other platforms, see [lrc-skill](https://github.com/labirthermal/lrc-skill) and the alternatives section below.
 - Have a Python installation available to VS Code, such as your existing Anaconda installation. VS Code itself does not include Python. If none is installed, obtain Windows x64 Python from [Python](https://www.python.org/downloads/windows/) or [Anaconda](https://www.anaconda.com/download), then restart VS Code. Python 3.12 matches the reference setup; other versions need verification.
 - Install the Microsoft Visual C++ v14 **x64** runtime from the [official Microsoft page](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist). Download the x64 installer, run it, and select **Install** or **Repair**. This runtime is separate from the Visual Studio application.
 - Internet access is needed for initial downloads and packages. Recordings are read locally afterwards.
@@ -145,7 +145,7 @@ print(frames.shape)
 print(times)
 ```
 
-Indices start at zero and must fit the image dimensions. Values and calibration come from the DLL; the Python interface does not report their temperature unit and does not independently verify calibration. The entire recording is loaded into RAM. Its temperature array alone needs `height × width × frames × 4` bytes, plus working memory.
+Indices start at zero and must fit the image dimensions. The LRC format defines stream-unit codes, but the DLL C wrapper used here does not expose that code. Values are not automatically degrees Celsius: depending on the camera and recording they may be temperature, intensity, or another quantity. This Python loader adds no unit conversion or radiometric correction; confirm the unit from explicit recording metadata and camera/export documentation. See **Library origin, units, and alternatives** below for the specification and API links. The entire recording is loaded into RAM. Its temperature array alone needs `height × width × frames × 4` bytes, plus working memory.
 
 For a script in this folder, use `from loaders import load_lrc`; loading does not require the viewer. Keep `LRCRecording.dll` beside `loaders.py`. Load sequentially, since concurrent or nested DLL calls are not supported. The example does not establish support for every LRC variant.
 
@@ -190,6 +190,41 @@ print("Working folder:", Path.cwd())
 ```
 
 Bitness should be **64**. The working folder should contain `loaders.py`, `requirements.txt`, and `LRC_Files`. Include this output, the complete error, and whether the example works when asking for help.
+
+## Library origin, units, and alternatives
+
+### Public library and attribution
+
+The bundled Windows x64 `LRCRecording.dll` is the same binary as `Python/LRCRecording.dll` in the public [lrc-recording v2.1 release](https://github.com/labirthermal/lrc-recording/tree/v2.1), published on 12 November 2026 under MIT: [DOI 10.5281/zenodo.24165802](https://doi.org/10.5281/zenodo.24165802). Its source and API documentation are publicly available.
+
+This loader adapts [Python/LRC_loading.py](https://github.com/labirthermal/lrc-recording/blob/v2.1/Python/LRC_loading.py), created in 2023 by Lukáš Mužika (credited in the original script as `LukasM`). Copyright (c) University of West Bohemia 2026 and the MIT terms are retained in [LICENSE](LICENSE).
+
+The upstream C++ library supports reading and writing, with static and dynamic builds. This project provides only a small reading helper and viewer. Additional metadata, notes, seeking, and writing capabilities of the upstream library are not automatically exposed by `load_lrc()`.
+
+The [C wrapper header](https://github.com/labirthermal/lrc-recording/blob/v2.1/LRCRecording/LRCRecordingWrapper.h) documents the API. This loader declares its ctypes argument and return types explicitly, calls `Close()` without an argument, and reads the `uint64_t` millisecond clock into a float64 seconds array. It acquires the frame buffer once and copies it before `NextFrame()` updates that shared buffer. The wrapper uses a single global reader, so loads must be sequential.
+
+### Recorded values are not necessarily degrees Celsius
+
+The public [LRC v2 format specification](https://github.com/labirthermal/lrc-recording/blob/v2.1/docs/LRC-FORMAT.md) defines a unit code in the stream header:
+
+| Code | Meaning |
+| --- | --- |
+| 0 | None |
+| 1 | Intensity |
+| 2 | Degrees Celsius |
+| 3 | Kelvin |
+| 4 | Time |
+| 5 | Radians |
+
+The format can describe units, but the C wrapper used by this loader does **not expose the stream-unit code**. `frames` contains the values decoded by the DLL; the Python layer does not apply additional unit conversion or radiometric correction. Depending on the camera and recording, values may be temperature or another quantity. Do not infer degrees Celsius from the function name, value range, a screenshot, or another camera's behavior. Confirm the unit from the recording's explicit metadata and the camera/export documentation. Some calibration fields are specified in Kelvin; that does not imply that pixel values are in Kelvin.
+
+### A pure-Python alternative for other platforms
+
+[lrc-skill](https://github.com/labirthermal/lrc-skill) provides a NumPy-based reader without a DLL, plus optional analysis tools for AI agents or command-line use. It targets Windows, macOS, and Linux; its reader is also an option for a Python environment such as Colab, subject to package installation, data access, and format compatibility. That workflow is not tested by this project.
+
+Its [0.1 release](https://github.com/labirthermal/lrc-skill/tree/0.1) is archived as [DOI 10.5281/zenodo.23596214](https://doi.org/10.5281/zenodo.23596214). It supports LRC v2 with one stream, supported uint16/float encodings, no external devices, and no dynamic header. Other variants raise an exception. This complements the upstream library; it does not guarantee support for every recording handled by the DLL.
+
+Check the API before substituting it: `read_lrc()` returns `(T, H, W)` float32 frames, float64 times, and metadata; the compatibility function `load_lrc()` returns `(H, W, T)` frames and float32 times in release 0.1. Our DLL helper returns `(H, W, T)` frames and float64 times. Confirm units for your own recording with either reader; the alternative's examples in degrees Celsius do not establish the unit of every camera.
 
 ## License
 
