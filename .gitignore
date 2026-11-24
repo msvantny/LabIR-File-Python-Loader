@@ -1,4 +1,13 @@
 # Byte-compiled / optimized / DLL files
+# Additional recordings stay local; distribute only the verified example.
+*.[lL][rR][cC]
+!/LRC_Files/sample_sequence_320x256_250Hz_006Fr.lrc
+
+# Local editor settings and generated figures.
+.vscode/
+results/
+Figures/
+
 __pycache__/
 *.py[codz]
 *$py.class
