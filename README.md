@@ -288,6 +288,10 @@ The Python code, notebook, documentation, bundled `LRCRecording.dll`, example re
 
 Third-party Python dependencies retain their own licenses.
 
+## Funding
+
+This work was supported by the Ministry of Education, Youth and Sports of the Czech Republic and co-funded by the European Union under the Johannes Amos Comenius Programme (OP JAK), project LABIR-PAV-2, No. CZ.02.01.01/00/23_021/0010932.
+
 ## Validation and references
 
 ### Tested configuration
